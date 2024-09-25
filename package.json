@@ -4,19 +4,24 @@
     "description": "Telegram bot for trading assets on fuel",
     "main": "index.js",
     "scripts": {
-      "start": "NODE_ENV=production ts-node src/index.ts",
-      "dev": "NODE_ENV=development ts-node src/index.ts"
+        "start": "NODE_ENV=production ts-node src/index.ts",
+        "dev": "NODE_ENV=development ts-node src/index.ts",
+        "format": "prettier --write \"src/**/*.ts\""
     },
     "author": "Tobiloba Emmanuel",
     "license": "ISC",
     "devDependencies": {
-      "@types/node": "^20.14.11",
-      "ts-node": "^10.9.2",
-      "typescript": "^5.5.3"
+        "@types/node": "^20.14.11",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.5.3",
+        "prettier": "^3.3.3"
     },
     "dependencies": {
-      "dotenv": "^16.4.5",
-      "grammy": "^1.27.0"
+        "@prisma/client": "^5.20.0",
+        "dotenv": "^16.4.5",
+        "fuels": "^0.94.6",
+        "grammy": "^1.27.0",
+        "mira-dex-ts": "^1.0.14",
+        "prisma": "^5.20.0"
     }
-  }
-  
+}
