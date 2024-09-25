@@ -1,0 +1,22 @@
+{
+    "name": "moon-sniper",
+    "version": "1.0.0",
+    "description": "Telegram bot for trading assets on fuel",
+    "main": "index.js",
+    "scripts": {
+      "start": "NODE_ENV=production ts-node src/index.ts",
+      "dev": "NODE_ENV=development ts-node src/index.ts"
+    },
+    "author": "Tobiloba Emmanuel",
+    "license": "ISC",
+    "devDependencies": {
+      "@types/node": "^20.14.11",
+      "ts-node": "^10.9.2",
+      "typescript": "^5.5.3"
+    },
+    "dependencies": {
+      "dotenv": "^16.4.5",
+      "grammy": "^1.27.0"
+    }
+  }
+  
