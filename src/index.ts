@@ -1,7 +1,7 @@
-import { Bot, CommandContext, Context, InlineKeyboard } from "grammy";
+import { Bot, CallbackQueryContext, CommandContext, Context, InlineKeyboard } from "grammy";
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
-import { validateEnv } from "./helper";
+import { getHomeInlineKeyboard, getHomeReplyMessage, validateEnv } from "./helper";
 import { MiraAmm, ReadonlyMiraAmm } from "mira-dex-ts";
 import { Account, Address, DEFAULT_DECIMAL_UNITS, Provider, WalletUnlocked } from "fuels";
 
@@ -18,7 +18,7 @@ const PROVIDER_URL = process.env.PROVIDER_URL;
 const bot = new Bot(BOT_TOKEN!);
 const prisma = new PrismaClient();
 
-const startHandler = async (ctx: CommandContext<Context>) => {
+const homeHandler = async (ctx: CommandContext<Context>) => {
   const provider = await Provider.create(PROVIDER_URL!);
   const chatId = ctx.msg.chat.id;
   const userName = ctx.msg.chat.username;
@@ -42,18 +42,53 @@ const startHandler = async (ctx: CommandContext<Context>) => {
   const address = Address.fromB256(wallet.address.toB256());
   wallet.provider = provider
   const balance = await wallet.getBalance(provider.getBaseAssetId());
-  const formattedBalance = balance.toNumber()/(10**DEFAULT_DECIMAL_UNITS)
-  let replyMessage =
-    `<b>Hey ${userName} 👋, welcome to MoonSniper🎉.</b>\n\nFuel's first and fastest bot for trading any asset.\n\n`;
-  if (formattedBalance == 0) {
-    replyMessage += `You currently have no ETH in your wallet. To get started with trading, send some ETH to your moonsnipe wallet address:\n\n<code>${address.toHexString()}</code> (tap to copy)\n\nOnce done tap refresh and your balance will appear here.\n\n`
-  } else {
-    replyMessage += `Wallet Address: <code>${address.toHexString()}</code> (tap to copy)\nETH Balance: $${formattedBalance}\n\n`
-  }
-  replyMessage += `To buy an asset, just enter the assetId.\n\nFor more info on your wallet and to retrieve your private key, tap the wallet button below. We guarantee the safety of user funds on MoonSnipe, but if you expose your private key your funds will not be safe.`
-  const inlineKeyboard = new InlineKeyboard().text("Buy 💰", "buy").text("My Trades  🔍", "trades").row().text("Wallet 💳", "wallet").text("Settings ⚙️", "settings").row().text("Refresh 🔄", "refresh")
+  const formattedBalance = balance.toNumber()/(10**DEFAULT_DECIMAL_UNITS);
+  const replyMessage = getHomeReplyMessage(formattedBalance, userName, address);
+  const inlineKeyboard = getHomeInlineKeyboard();
   ctx.reply(replyMessage, { parse_mode: "HTML", reply_markup: inlineKeyboard });
 };
 
-bot.command("start", startHandler);
-bot.start().catch((err) => console.log(`An Error occurred: ${err.message}`));
+const buyHandler = async (ctx: CallbackQueryContext<Context>) => {
+    ctx.reply("You want to buy??....")
+}
+
+const myTradesHandler = async (ctx: CallbackQueryContext<Context>) => {
+    ctx.reply("You want to view your trades??...")
+}
+
+const walletHandler = async (ctx: CallbackQueryContext<Context>) => {
+    ctx.reply("You want to view your wallet??...")
+}
+
+const settingsHandler = async (ctx: CallbackQueryContext<Context>) => {
+    ctx.reply("You want to view your settings??...")
+}
+
+const refreshHandler = async (ctx: CallbackQueryContext<Context>) => {
+    const provider = await Provider.create(PROVIDER_URL!);
+    const userWallet = await prisma.wallet.findUniqueOrThrow({
+        where: { chatId: ctx.msg?.chat.id },
+    });
+    const wallet = await WalletUnlocked.fromEncryptedJson(userWallet.walletJson, ENCRYPTION_KEY!);
+    const address = Address.fromB256(wallet.address.toB256());
+    wallet.provider = provider;
+    const balance = await wallet.getBalance(provider.getBaseAssetId());
+    const formattedBalance = balance.toNumber()/(10**DEFAULT_DECIMAL_UNITS);
+    const replyMessage = getHomeReplyMessage(formattedBalance, ctx.msg?.chat.username, address);
+    const inlineKeyboard = getHomeInlineKeyboard();
+    ctx.editMessageText(replyMessage, { reply_markup: inlineKeyboard, parse_mode: "HTML"})
+}
+
+bot.command("start", homeHandler);
+bot.command("home", homeHandler);
+bot.callbackQuery("refresh", refreshHandler);
+bot.callbackQuery("buy", buyHandler);
+bot.callbackQuery("trades", myTradesHandler);
+bot.callbackQuery("wallet", walletHandler);
+bot.callbackQuery("settings", settingsHandler);
+bot.catch((err) => console.log(`An Error occurred: ${err.message}`))
+bot.start()
+bot.api.setMyCommands([
+    { command: "home", description: "open main menu" },
+    { command: "settings", description: "customize bot" }
+])
