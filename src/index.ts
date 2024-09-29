@@ -25,9 +25,8 @@ import {
   getPoolId,
   validateEnv,
 } from "./helper";
-import { getAssetId, MiraAmm, PoolId, ReadonlyMiraAmm } from "mira-dex-ts";
+import { MiraAmm, ReadonlyMiraAmm } from "mira-dex-ts";
 import {
-  Account,
   Address,
   BN,
   DEFAULT_DECIMAL_UNITS,
@@ -37,7 +36,7 @@ import {
 import { SUPPORTED_ASSETS } from "./constants";
 
 if (process.env.NODE_ENV == "development") {
-  dotenv.config();
+  dotenv.config({ path: ".env" });
 }
 
 const requiredEnv = ["BOT_TOKEN", "ENCRYPTION_KEY"];
@@ -76,6 +75,7 @@ bot.use(conversations());
 const prisma = new PrismaClient();
 
 const buyAsset = async (conversation: BotConversation, ctx: BotContext) => {
+  console.log(`Buy Asset command called by:\nUser Name: ${ctx.msg?.chat.username}\nFirst Name: ${ctx.msg?.chat.first_name}\nLast Name: ${ctx.msg?.chat.last_name}`);
   const asset = ctx.session.buyAsset;
   const provider = await Provider.create(PROVIDER_URL!);
   await ctx.reply(
@@ -213,7 +213,7 @@ const homeHandler = async (ctx: CommandContext<BotContext>) => {
   let userWallet = await prisma.wallet.findUnique({
     where: { chatId },
   });
-
+  console.log(`Home command called by:\nUser Name: ${userName}\nFirst Name: ${ctx.msg.chat.first_name}\nLast Name: ${ctx.msg.chat.last_name}`);
   if (userWallet) {
     wallet = await WalletUnlocked.fromEncryptedJson(
       userWallet.walletJson,
@@ -239,6 +239,7 @@ const homeHandler = async (ctx: CommandContext<BotContext>) => {
 };
 
 const assetListHandler = async (ctx: CommandContext<BotContext>) => {
+  console.log(`Asset List command called by:\nUser Name: ${ctx.msg?.chat.username}\nFirst Name: ${ctx.msg?.chat.first_name}\nLast Name: ${ctx.msg?.chat.last_name}`);
   let messageText = "Supported Assets 💹:\n\n";
   for (const asset of SUPPORTED_ASSETS) {
     messageText += `Name: ${asset.name}\nSymbol: <code>${asset.symbol}</code> (tap to copy)\nAsset Id: <code>${asset.assetId}</code> (tap to copy)\n\n`;
@@ -250,6 +251,7 @@ const assetListHandler = async (ctx: CommandContext<BotContext>) => {
 };
 
 const buyHandler = async (ctx: CallbackQueryContext<BotContext>) => {
+  console.log(`Buy button called by:\nUser Name: ${ctx.msg?.chat.username}\nFirst Name: ${ctx.msg?.chat.first_name}\nLast Name: ${ctx.msg?.chat.last_name}`);
   const messageText =
     "Buy Asset:\n\nTo buy an asset, enter the asset symbol or assetId.\n\nEnter the <code>/assets</code> command to view supported asset lists and their symbol.";
   ctx.reply(messageText, {
@@ -259,6 +261,7 @@ const buyHandler = async (ctx: CallbackQueryContext<BotContext>) => {
 };
 
 const myTradesHandler = async (ctx: CallbackQueryContext<BotContext>) => {
+  console.log(`My Trades called by:\nUser Name: ${ctx.msg?.chat.username}\nFirst Name: ${ctx.msg?.chat.first_name}\nLast Name: ${ctx.msg?.chat.last_name}`);
   const chatId = ctx.msg?.chat.id;
   const userWallet = await prisma.wallet.findUniqueOrThrow({
     where: { chatId },
@@ -285,6 +288,7 @@ const myTradesHandler = async (ctx: CallbackQueryContext<BotContext>) => {
 };
 
 const tradeDetailHandler = async (ctx: CommandContext<BotContext>) => {
+  console.log(`Trade details called by:\nUser Name: ${ctx.msg?.chat.username}\nFirst Name: ${ctx.msg?.chat.first_name}\nLast Name: ${ctx.msg?.chat.last_name}`);
   const positionId = ctx.msg.text.slice(6);
   const position = await prisma.position.findUniqueOrThrow({
     where: { id: parseInt(positionId) },
@@ -301,6 +305,7 @@ const tradeDetailHandler = async (ctx: CommandContext<BotContext>) => {
 };
 
 const walletHandler = async (ctx: CallbackQueryContext<BotContext>) => {
+  console.log(`Wallet details called by:\nUser Name: ${ctx.msg?.chat.username}\nFirst Name: ${ctx.msg?.chat.first_name}\nLast Name: ${ctx.msg?.chat.last_name}`);
   const provider = await Provider.create(PROVIDER_URL!);
   const userWallet = await prisma.wallet.findUniqueOrThrow({
     where: { chatId: ctx.msg?.chat.id },
