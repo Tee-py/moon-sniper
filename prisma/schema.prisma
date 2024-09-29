@@ -18,4 +18,16 @@ model Wallet {
   chatId     Int      @unique
   walletJson String
   createdAt  DateTime @default(now())
+  positions Position[]
+}
+
+model Position {
+  id        Int   @id @default(autoincrement())
+  wallet    Wallet   @relation(fields: [walletId], references: [id])
+  walletId  Int
+  assetId   String
+  assetSymbol String
+  decimals  Int
+  amount    String
+  createdAt DateTime @default(now())
 }

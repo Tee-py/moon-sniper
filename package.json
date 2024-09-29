@@ -5,23 +5,27 @@
     "main": "index.js",
     "scripts": {
         "start": "NODE_ENV=production ts-node src/index.ts",
-        "dev": "NODE_ENV=development ts-node src/index.ts",
+        "dev": "NODE_ENV=development npx tsx src/index.ts",
         "format": "prettier --write \"src/**/*.ts\""
     },
     "author": "Tobiloba Emmanuel",
     "license": "ISC",
     "devDependencies": {
         "@types/node": "^20.14.11",
+        "prettier": "^3.3.3",
         "ts-node": "^10.9.2",
-        "typescript": "^5.5.3",
-        "prettier": "^3.3.3"
+        "tsx": "^4.19.1",
+        "typescript": "^5.5.3"
     },
     "dependencies": {
+        "@compolabs/spark-orderbook-ts-sdk": "^1.8.8",
+        "@grammyjs/conversations": "^1.2.0",
+        "@grammyjs/storage-free": "^2.4.2",
         "@prisma/client": "^5.20.0",
         "dotenv": "^16.4.5",
         "fuels": "^0.94.6",
         "grammy": "^1.27.0",
-        "mira-dex-ts": "^1.0.14",
+        "mira-dex-ts": "^1.0.13",
         "prisma": "^5.20.0"
     }
 }
