@@ -25,9 +25,8 @@ import {
   getPoolId,
   validateEnv,
 } from "./helper";
-import { getAssetId, MiraAmm, PoolId, ReadonlyMiraAmm } from "mira-dex-ts";
+import { MiraAmm, ReadonlyMiraAmm } from "mira-dex-ts";
 import {
-  Account,
   Address,
   BN,
   DEFAULT_DECIMAL_UNITS,
@@ -37,7 +36,7 @@ import {
 import { SUPPORTED_ASSETS } from "./constants";
 
 if (process.env.NODE_ENV == "development") {
-  dotenv.config();
+  dotenv.config({ path: ".env" });
 }
 
 const requiredEnv = ["BOT_TOKEN", "ENCRYPTION_KEY"];
@@ -56,6 +55,7 @@ type BotContext = Context & SessionFlavor<SessionData> & ConversationFlavor;
 type BotConversation = Conversation<BotContext>;
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
+console.log(BOT_TOKEN);
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 const PROVIDER_URL = process.env.PROVIDER_URL;
 const bot = new Bot<BotContext>(BOT_TOKEN!);
@@ -206,6 +206,7 @@ const buyAsset = async (conversation: BotConversation, ctx: BotContext) => {
 bot.use(createConversation(buyAsset));
 
 const homeHandler = async (ctx: CommandContext<BotContext>) => {
+  console.log("triggered..");
   const provider = await Provider.create(PROVIDER_URL!);
   const chatId = ctx.msg.chat.id;
   const userName = ctx.msg.chat.username;
